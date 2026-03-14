@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="auth-screen" class="screen visible">
+    <div class="auth-card">
+      <h2>Register</h2>
+      <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <input type="password" id="confirm-password" placeholder="Confirm Password" required />
+        <button type="submit" id="register-btn" class="big-btn">Register</button>
+      </form>
+      <div id="message" style="margin-top:10px;"></div>
+      <a href="/" style="display:block; margin-top:10px; text-align:center; color:#00f;">Back to Login</a>
+    </div>
+  </div>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const msgEl = document.getElementById('message');
+      msgEl.style.color = 'red';
+
+      if(password !== confirmPassword){
+        msgEl.textContent = 'Passwords do not match!';
+        return;
+      }
+
+      fetch('/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+      })
+      .then(res => res.json())
+      .then(data => {
+        msgEl.style.color = data.error ? 'red' : 'green';
+        msgEl.textContent = data.error || 'Registered successfully! Please login.';
+      })
+      .catch(() => {
+        msgEl.textContent = 'Registration failed, try again.';
+      });
+    });
+  </script>
+</body>
+</html>
+
+

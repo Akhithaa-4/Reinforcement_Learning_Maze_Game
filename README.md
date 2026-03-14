@@ -24,7 +24,7 @@ Python
 
 NumPy
 
-Reinforcement Learning (Q-Learning)
+Reinforcement Learning (Q-Learning, sarsa_agent)
 
 Matplotlib (for visualization)
 

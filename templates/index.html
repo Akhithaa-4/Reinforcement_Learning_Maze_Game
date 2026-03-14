@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Runner - 3D Adventure Game</title>
+    <style>
+        :root {
+            --primary: #8B4513;
+            --primary-dark: #654321;
+            --secondary: #FFD700;
+            --accent-purple: #9B59B6;
+            --accent-cyan: #3498DB;
+            --accent-green: #2ECC71;
+            --accent-orange: #E67E22;
+            --success: #2ECC71;
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --dark: #2C3E50;
+            --dark-light: #34495E;
+            --text-light: #ffffff;
+            --text-muted: #BDC3C7;
+            --tom-blue: #4A90E2;
+            --jerry-brown: #8B4513;
+            --cheese-yellow: #FFD700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #FFF9C4 50%, #FFE0B2 100%);
+            color: #2C3E50;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(74, 144, 226, 0.1) 0%, transparent 60%),
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255, 215, 0, 0.03) 50px, rgba(255, 215, 0, 0.03) 100px);
+            animation: bgPulse 10s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.95) 0%, rgba(74, 144, 226, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--cheese-yellow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 50%, var(--tom-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: logoShine 3s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes logoShine {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(139, 69, 19, 0.6)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.8)); }
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 50%, var(--tom-blue) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+            animation: btnGlow 2s ease-in-out infinite;
+            border: 3px solid var(--cheese-yellow);
+            font-weight: 900;
+        }
+
+        @keyframes btnGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4); }
+            50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6); }
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.05) rotate(-2deg);
+            box-shadow: 0 8px 30px rgba(74, 144, 226, 0.6);
+            animation: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .btn-secondary::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--jerry-brown), var(--cheese-yellow), var(--tom-blue), var(--cheese-yellow));
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes borderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Screen */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 25%, var(--tom-blue) 50%, var(--cheese-yellow) 75%, var(--jerry-brown) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowGlow 3s ease-in-out infinite, gradientShift 5s ease infinite;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes rainbowGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(139, 69, 19, 0.8)); }
+            33% { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)); }
+            66% { filter: drop-shadow(0 0 25px rgba(74, 144, 226, 0.8)); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #34495E;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 253, 231, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--cheese-yellow);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--jerry-brown), var(--cheese-yellow), var(--tom-blue), var(--cheese-yellow));
+            background-size: 200% 100%;
+            animation: gradientSlide 3s ease infinite;
+        }
+
+        @keyframes gradientSlide {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02) rotate(1deg);
+            box-shadow: 0 15px 50px rgba(139, 69, 19, 0.4), 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: iconBounce 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(-5deg); }
+            75% { transform: translateY(-5px) rotate(5deg); }
+        }
+
+        .feature-card:hover .feature-icon {
+            animation: iconSpin 0.6s ease;
+        }
+
+        @keyframes iconSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .feature-card h3 {
+            color: var(--jerry-brown);
+            margin-bottom: 0.5rem;
+            font-weight: 900;
+        }
+
+        /* Login/Register */
+        .auth-container {
+            max-width: 450px;
+            margin: 4rem auto;
+        }
+
+        .auth-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 253, 231, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            border: 4px solid var(--cheese-yellow);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--jerry-brown);
+            font-weight: 900;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495E;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--cheese-yellow);
+            border-radius: 12px;
+            color: #2C3E50;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--jerry-brown);
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Game Selection */
+        .game-selection {
+            padding: 2rem 0;
+        }
+
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .difficulty-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 253, 231, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .difficulty-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .difficulty-card:hover::before {
+            opacity: 1;
+        }
+
+        .difficulty-card:hover {
+            border-color: var(--cheese-yellow);
+            transform: scale(1.08) rotate(2deg);
+            box-shadow: 0 20px 60px rgba(139, 69, 19, 0.5), 0 15px 40px rgba(255, 215, 0, 0.4);
+            animation: cardPulse 0.5s ease;
+        }
+
+        @keyframes cardPulse {
+            0%, 100% { transform: scale(1.08) rotate(2deg); }
+            50% { transform: scale(1.1) rotate(-2deg); }
+        }
+
+        .difficulty-card.easy {
+            border-top: 5px solid var(--success);
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+
+        .difficulty-card.medium {
+            border-top: 5px solid var(--cheese-yellow);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+
+        .difficulty-card.hard {
+            border-top: 5px solid var(--danger);
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+
+        .difficulty-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--jerry-brown);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #34495E;
+            font-weight: 600;
+        }
+
+        /* Game Canvas */
+        .game-container {
+            position: relative;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 600px;
+            display: block;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .game-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .hud-item {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            border: 3px solid var(--cheese-yellow);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .hud-label {
+            font-size: 0.85rem;
+            color: #34495E;
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
+        .hud-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 50%, var(--tom-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: valueGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes valueGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(139, 69, 19, 0.6)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Leaderboard */
+        .leaderboard-table {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .leaderboard-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background: rgba(56, 189, 248, 0.1);
+            padding: 1rem;
+            text-align: left;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .leaderboard-table td {
+            padding: 1rem;
+            border-top: 1px solid rgba(56, 189, 248, 0.1);
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .rank-2 { background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); }
+        .rank-3 { background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); }
+
+        /* Admin Panel */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .admin-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 253, 231, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--cheese-yellow);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card .stat-label {
+            font-size: 1rem;
+            color: #34495E;
+            margin-top: 0.5rem;
+            font-weight: 700;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 253, 231, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            border: 5px solid var(--cheese-yellow);
+            border-radius: 25px;
+            padding: 3rem;
+            max-width: 700px;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--jerry-brown) 0%, var(--cheese-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .modal-stat {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--cheese-yellow);
+        }
+
+        /* Maze Styles */
+        .maze-wall {
+            fill: #FFFACD;
+            stroke: var(--jerry-brown);
+            stroke-width: 3;
+        }
+
+        .maze-path {
+            fill: #FFF9E6;
+        }
+
+        .maze-player {
+            fill: var(--jerry-brown);
+            filter: drop-shadow(0 0 15px var(--jerry-brown));
+            animation: playerPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes playerPulse {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(139, 69, 19, 0.8)); }
+            50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)); }
+        }
+
+        .maze-goal {
+            fill: var(--cheese-yellow);
+            filter: drop-shadow(0 0 20px var(--cheese-yellow));
+            animation: goalPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes goalPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1)); transform: scale(1.1); }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(2deg); }
+            75% { transform: translateY(-5px) rotate(-2deg); }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .difficulty-grid { grid-template-columns: 1fr; }
+            .game-hud { flex-direction: column; gap: 10px; }
+            .nav-btns { flex-direction: column; gap: 0.5rem; }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 253, 231, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--cheese-yellow);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            color: #2C3E50;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideInRight 0.3s ease;
+            z-index: 2000;
+            font-weight: 700;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">🎮 MAZE RUNNER</div>
+            <div class="nav-btns" id="navBtns">
+                <!-- Dynamic navigation buttons -->
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen active">
+            <div class="hero">
+                <h1 class="float">🐭 MAZE RUNNER 🧀</h1>
+                <p>Help Jerry escape through mazes, collect cheese, and outsmart Tom!</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="showScreen('loginScreen')">🎯 Login </button>
+                    <button class="btn btn-secondary" onclick="playAsGuest()">🚀 Play as Guest</button>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🐭</div>
+                    <h3>Play as Jerry</h3>
+                    <p>Control Jerry the mouse through challenging mazes to escape from Tom!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧀</div>
+                    <h3>Collect Cheese</h3>
+                    <p>Navigate through mazes to reach the delicious cheese goal!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3>Beat the Clock</h3>
+                    <p>Race against time before Tom catches up with you!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Chase & Score</h3>
+                    <p>Compete with other players and become the ultimate maze champion!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>🎮 Login to Play</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="loginUsername" required placeholder="Enter your username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Start Game</button>
+                    </form>
+                    <div class="auth-switch">
+                        Don't have an account? <a onclick="showScreen('registerScreen')">Register here</a>
+                    </div>
+                    <div class="auth-switch">
+                        <a onclick="showScreen('homeScreen')">← Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Screen -->
+        <div id="registerScreen" class="screen">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>🎯 Create Account</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="regUsername" required placeholder="Choose a username">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" required placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="regPassword" required placeholder="Create a password">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Register</button>
+                    </form>
+                    <div class="auth-switch">
+                        Already have an account? <a onclick="showScreen('loginScreen')">Login here</a>
+                    </div>
+                    <div class="auth-switch">
+                        <a onclick="showScreen('homeScreen')">← Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- GAME MENU SCREEN -->
+        <div id="gameMenuScreen" class="screen">
+
+            <h1 class="float" style="margin-bottom: 2rem;">Welcome, <span id="userWelcomeName"></span> 👋</h1>
+
+            <div class="feature-grid">
+
+                <div class="feature-card" onclick="openModeSelection()">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Select Mode</h3>
+                    <p>Choose between Human or AI mode before starting.</p>
+                </div>
+
+                <div class="feature-card" onclick="showScreen('leaderboardScreen')">
+                    <div class="feature-icon">🏆</div>
+                    <h3>View Scoreboard</h3>
+                    <p>Check your scores and compare with others.</p>
+                </div>
+
+                <div class="feature-card" onclick="showScreen('preferencesScreen')">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Preferences</h3>
+                    <p>Save game settings and custom preferences.</p>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- PREFERENCES SCREEN -->
+        <div id="preferencesScreen" class="screen">
+            <h1 class="float" style="margin-bottom: 2rem">Preferences</h1>
+            <div class="form-box">
+                <label>Preferred Difficulty</label>
+                <select id="prefDifficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                </select>
+
+                <label style="margin-left: 1rem">Mode</label>
+                <select id="prefMode">
+                <option value="human">Human</option>
+                <option value="ai">AI</option>
+                </select>
+
+                <label style="margin-left: 1rem">Sound</label>
+                <select id="prefSound">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+                </select>
+
+                <button class="btn btn-primary" onclick="savePreferences()">
+                Save Preferences
+                </button>
+                <button class="btn btn-primary" onclick="startFromPreferences()">
+                Start With Preferences
+                </button>
+                <button class="btn btn-secondary" onclick="showScreen('gameMenuScreen')">
+                Back
+                </button>
+            </div>
+            </div>
+
+        <!-- ADMIN: Professional Panel -->
+        <div id="adminScreen" class="screen" style="padding: 2rem;">
+
+        <div class="admin-layout" style="display:flex; gap:1rem; align-items:stretch;">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar" style="width:260px; background:linear-gradient(180deg,#0f172a10,#fff0); border-radius:12px; padding:1rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+                <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,#f59e0b,#4a90e2);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">A</div>
+                <div>
+                <div style="font-weight:700;">Admin</div>
+                <div id="adminWelcome" style="font-size:0.9rem;color:#334155;">Dashboard</div>
+                </div>
+            </div>
+
+            <nav style="display:flex; flex-direction:column; gap:0.5rem;">
+                <button class="btn btn-ghost admin-nav-btn" data-target="adminOverview">Overview</button>
+                <button class="btn btn-ghost admin-nav-btn" data-target="adminUsers">Users</button>
+                <button class="btn btn-ghost admin-nav-btn" data-target="adminScores">Scores</button>
+                <button class="btn btn-ghost admin-nav-btn" data-target="adminPrefs">Preferences</button>
+                <button class="btn btn-ghost admin-nav-btn" data-target="adminSettings">Settings</button>
+                <div style="margin-top:1rem;"><button class="btn btn-secondary" onclick="showScreen('homeScreen')">Exit Admin</button></div>
+            </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <section class="admin-main" style="flex:1; min-height:520px; background:linear-gradient(180deg,#ffffff,#fff9ed); border-radius:12px; padding:1.5rem;">
+            <!-- Overview -->
+            <div id="adminOverview" class="admin-panel">
+                <h2>Admin Overview</h2>
+                <div style="display:flex;gap:1rem;margin-top:1rem;">
+                <div style="flex:1;padding:1rem;border-radius:10px;background:#fff;box-shadow:var(--card-shadow);">
+                    <div style="font-size:0.9rem;color:#64748b">Total Players</div>
+                    <div id="admin_totalPlayers" style="font-size:1.6rem;font-weight:700;margin-top:0.25rem">0</div>
+                </div>
+                <div style="flex:1;padding:1rem;border-radius:10px;background:#fff;box-shadow:var(--card-shadow);">
+                    <div style="font-size:0.9rem;color:#64748b">Total Games</div>
+                    <div id="admin_totalGames" style="font-size:1.6rem;font-weight:700;margin-top:0.25rem">0</div>
+                </div>
+                <div style="flex:1;padding:1rem;border-radius:10px;background:#fff;box-shadow:var(--card-shadow);">
+                    <div style="font-size:0.9rem;color:#64748b">Avg Score</div>
+                    <div id="admin_avgScore" style="font-size:1.6rem;font-weight:700;margin-top:0.25rem">0</div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Users -->
+            <div id="adminUsers" class="admin-panel" style="display:none;">
+                <h2>Players</h2>
+                <div style="margin-top:1rem;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                    <tr style="text-align:left;color:#374151;">
+                        <th>#</th><th>Username</th><th>Email</th><th>Games</th><th>Joined</th><th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="adminUsersBody"></tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Scores -->
+            <div id="adminScores" class="admin-panel" style="display:none;">
+                <h2>Scores</h2>
+                <div style="margin-top:1rem; max-height:420px; overflow:auto;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                    <tr style="text-align:left;color:#374151;">
+                        <th>#</th><th>User</th><th>Difficulty</th><th>Score</th><th>Time</th><th>Moves</th><th>Date</th><th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="adminScoresBody"></tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Preferences viewer -->
+            <div id="adminPrefs" class="admin-panel" style="display:none;">
+                <h2>User Preferences</h2>
+                <div id="adminPrefsBody" style="margin-top:1rem;"></div>
+            </div>
+
+            <!-- Settings -->
+            <div id="adminSettings" class="admin-panel" style="display:none;">
+                <h2>Admin Settings</h2>
+                <p>Small tools for admin — export DB, reset Q-table, seed test users, etc.</p>
+                <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <button class="btn btn-primary" onclick="exportDatabase()">Export DB</button>
+                <button class="btn btn-secondary" onclick="resetAllScores()">Clear Scores</button>
+                <button class="btn btn-secondary" onclick="resetQ()">Reset Q-Table</button>
+                <button class="btn btn-secondary" onclick="seedTestUsers()">Seed Users</button>
+                </div>
+            </div>
+            </section>
+        </div>
+        </div>
+
+        <!-- Game Selection Screen -->
+        <div id="gameSelectionScreen" class="screen">
+            <div class="game-selection">
+                <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">Choose Difficulty</h2>
+                <div class="difficulty-grid">
+                    <div class="difficulty-card easy" onclick="startGame('easy')">
+                        <h3>🟢 EASY</h3>
+                        <p>Perfect for beginners. Smaller maze with more time.</p>
+                        <div class="difficulty-stats">
+                            <div class="stat">
+                                <div class="stat-value">10x10</div>
+
+
+
+                                <div class="stat-label">Grid Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">120s</div>
+                                <div class="stat-label">Time Limit</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">100</div>
+                                <div class="stat-label">Base Points</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="difficulty-card medium" onclick="startGame('medium')">
+                        <h3>🟡 MEDIUM</h3>
+                        <p>Balanced challenge with moderate complexity.</p>
+                        <div class="difficulty-stats">
+                            <div class="stat">
+                                <div class="stat-value">15x15</div>
+                                <div class="stat-label">Grid Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">90s</div>
+                                <div class="stat-label">Time Limit</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">200</div>
+                                <div class="stat-label">Base Points</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="difficulty-card hard" onclick="startGame('hard')">
+                        <h3>🔴 HARD</h3>
+                        <p>Ultimate challenge for expert maze solvers.</p>
+                        <div class="difficulty-stats">
+                            <div class="stat">
+                                <div class="stat-value">20x20</div>
+                                <div class="stat-label">Grid Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">60s</div>
+                                <div class="stat-label">Time Limit</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">500</div>
+                                <div class="stat-label">Base Points</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="showScreen('homeScreen')">← Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-container">
+                <canvas id="gameCanvas"></canvas>
+                <div class="game-hud">
+                    <div class="hud-item">
+                        <div class="hud-label">Time</div>
+                        <div class="hud-value" id="timeValue">0:00</div>
+                    </div>
+                    <div class="hud-item">
+                        <div class="hud-label">Score</div>
+                        <div class="hud-value" id="scoreValue">0</div>
+                    </div>
+                    <div class="hud-item">
+                        <div class="hud-label">Moves</div>
+                        <div class="hud-value" id="movesValue">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-controls">
+                <button class="btn btn-secondary" onclick="pauseGame()">⏸️ Pause</button>
+                <button class="btn btn-secondary" onclick="resetGame()">🔄 Reset</button>
+                <button class="btn btn-secondary" onclick="showScreen('gameSelectionScreen')">🏠 Menu</button>
+            </div>
+            <div style="text-align: center; margin-top: 1.5rem; color: #34495E; font-weight: 700;">
+                <p>🐭 Use Arrow Keys or WASD to help Jerry reach the cheese! 🧀</p>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="leaderboardScreen" class="screen">
+            <h2 style="text-align: center; font-size: 2.5rem; margin: 2rem 0;">🏆 Global Leaderboard</h2>
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Difficulty</th>
+                            <th>Time</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="showScreen('homeScreen')">← Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminScreen" class="screen">
+            <h2 style="text-align: center; font-size: 2.5rem; margin: 2rem 0;">⚙️ Admin Dashboard</h2>
+            <div class="admin-grid">
+                <div class="admin-card stat-card">
+                    <div class="stat-value" id="totalPlayers">0</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="admin-card stat-card">
+                    <div class="stat-value" id="totalGames">0</div>
+                    <div class="stat-label">Games Played</div>
+                </div>
+                <div class="admin-card stat-card">
+                    <div class="stat-value" id="avgScore">0</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+            </div>
+            <div class="admin-card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Player Management</h3>
+                <div class="leaderboard-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Total Scores</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPlayersBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <!-- Victory / Result Modal -->
+    <div id="victoryModal" class="modal">
+        <div class="modal-content">
+            <!-- Title and message are set from JS based on mode & winner -->
+            <h2 id="resultTitle">🎉 You Won!</h2>
+            <p id="resultMessage">Jerry escaped Tom. Great job!</p>
+
+            <div class="modal-stats">
+            <!-- Always show YOUR stats (Jerry / player) -->
+            <div class="modal-stat">
+                <div class="hud-label">Your Time</div>
+                <div class="hud-value" id="finalTime">0:00</div>
+            </div>
+            <div class="modal-stat">
+                <div class="hud-label">Your Score</div>
+                <div class="hud-value" id="finalScore">0</div>
+            </div>
+            <div class="modal-stat">
+                <div class="hud-label">Your Moves</div>
+                <div class="hud-value" id="finalMoves">0</div>
+            </div>
+            <div class="modal-stat">
+                <div class="hud-label">Result</div>
+                <!-- JS can put EASY / HARD or text like “Tom outsmarted you” here -->
+                <div class="hud-value" id="finalDifficulty">EASY</div>
+            </div>
+            </div>
+
+            <div style="display:flex;gap:1rem;justify-content:center;margin-top:2rem;">
+            <button class="btn btn-primary"
+                    onclick="closeVictoryModal(); showScreen('gameSelectionScreen')">
+                Play Again
+            </button>
+            <button class="btn btn-secondary"
+                    onclick="closeVictoryModal(); showScreen('leaderboardScreen')">
+                View Leaderboard
+            </button>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+        <script src="static/game.js" defer></script>
+
+</body>
+</html>
