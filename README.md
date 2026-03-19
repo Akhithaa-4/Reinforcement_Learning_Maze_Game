@@ -1,69 +1,87 @@
-Reinforcement Learning Maze Solver
-Overview
+🧠 Reinforcement Learning Maze Solver
 
-This project implements a Reinforcement Learning-based agent that learns to navigate and solve a maze environment.
-The agent interacts with the environment, learns from rewards and penalties, and gradually improves its ability to find the optimal path from the start position to the goal.
+An intelligent agent that learns to navigate a maze using Reinforcement Learning.
+This project demonstrates how an agent improves its decisions over time through rewards, penalties, and exploration.
 
-The project demonstrates the practical application of Reinforcement Learning concepts such as exploration, exploitation, and reward-based learning.
+🚀 Overview
 
-Key Features
+This project implements a Reinforcement Learning-based agent that learns to solve a maze environment.
+Starting with no prior knowledge, the agent interacts with the environment and gradually discovers the optimal path from start to goal.
 
-Maze environment simulation
+It highlights key RL concepts like:
 
-Reinforcement Learning agent training
+Exploration vs Exploitation
 
-Q-learning based decision making
+Reward-based learning
 
-Reward and penalty system for learning
+Policy improvement over time
 
-Visualization of agent movement inside the maze
+🎯 Key Features
 
-Technologies Used
+🧩 Maze environment simulation
+
+🤖 Q-Learning & SARSA-based agents
+
+⚖️ Reward & penalty system
+
+📈 Training over multiple episodes
+
+🎥 Visualization of agent movement
+
+🛠️ Tech Stack
 
 Python
 
 NumPy
 
-Reinforcement Learning (Q-Learning, sarsa_agent)
+Matplotlib
 
-Matplotlib (for visualization)
+Reinforcement Learning Algorithms
 
-How It Works
+Q-Learning
 
-The maze environment is initialized with a start point and goal state.
+SARSA
 
-The agent explores different paths through the maze.
+⚙️ How It Works
 
-Rewards are given for correct moves and penalties for incorrect moves.
+The maze is initialized with a start and goal state
 
-Over multiple iterations, the agent learns the optimal path to the goal using reinforcement learning.
+The agent explores the maze by taking actions
 
+Rewards and penalties guide learning
 
-How to Run
+Q-values are updated iteratively
 
-Clone the repository:
+Over time, the agent converges to the optimal path
 
+▶️ How to Run
+# Clone the repository
 git clone https://github.com/yourusername/reinforcement-learning-maze.git
 
-Navigate to the project folder:
-
+# Navigate into the folder
 cd reinforcement-learning-maze
 
-Run the training script:
-
+# Run the training script
 python train.py
-Learning Outcome
+📊 Learning Outcomes
 
-This project helped strengthen my understanding of:
+Through this project, I gained hands-on experience in:
 
-Reinforcement learning fundamentals
+Reinforcement Learning fundamentals
 
-Q-learning algorithms
+Q-Learning and SARSA algorithms
 
 Agent-environment interaction
 
-Iterative model improvement through rewards
+Iterative learning using rewards
 
-Author
+📌 Future Improvements
 
-Akhitha P
+Add Deep Q-Learning (DQN)
+
+Improve visualization (GUI-based maze)
+
+Add different maze complexities
+
+Compare multiple RL algorithms
+
